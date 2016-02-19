@@ -7,37 +7,38 @@ import java.io.IOException;
 import org.apache.hadoop.io.Writable;
 
 public class MutualFriendWritable implements Writable {
-	private long userID;
+	private long recommendedFriendID;
 	private long mutualFriendID;
 
 	public MutualFriendWritable() {
-		this("-1L", -1L);
+		this(-1L, -1L);
 	}
 
-	public MutualFriendWritable(String userID, long mutualFriendID) {
+	public MutualFriendWritable(Long recommendedFriendID,
+			long mutualFriendID) {
 		super();
-		this.userID = Long.parseLong(userID);
+		this.recommendedFriendID = recommendedFriendID;
 		this.mutualFriendID = mutualFriendID;
 	}
 
 	@Override
 	public void readFields(DataInput input) throws IOException {
-		this.userID = input.readLong();
+		this.recommendedFriendID = input.readLong();
 		this.mutualFriendID = input.readLong();
 	}
 
 	@Override
 	public void write(DataOutput output) throws IOException {
-		output.writeLong(userID);
+		output.writeLong(recommendedFriendID);
 		output.writeLong(mutualFriendID);
 	}
 
-	public long getUserID() {
-		return userID;
+	public long getRecommendedFriendID() {
+		return recommendedFriendID;
 	}
 
-	public void setUserID(long userID) {
-		this.userID = userID;
+	public void setRecommendedFriendID(long recommendedFriendID) {
+		this.recommendedFriendID = recommendedFriendID;
 	}
 
 	public long getMutualFriendID() {
@@ -50,8 +51,9 @@ public class MutualFriendWritable implements Writable {
 
 	@Override
 	public String toString() {
-		return "MutualFriendWritable [userID=" + userID + ", mutualFriendID="
-				+ mutualFriendID + "]";
+		return "MutualFriendWritable [recommendedFriendID="
+				+ recommendedFriendID + ", mutualFriendID=" + mutualFriendID
+				+ "]";
 	}
 
 }
