@@ -11,12 +11,12 @@ public class MutualFriendWritable implements Writable {
 	private long mutualFriendID;
 
 	public MutualFriendWritable() {
-		this(-1L, -1L);
+		this("-1L", -1L);
 	}
 
-	public MutualFriendWritable(long userID, long mutualFriendID) {
+	public MutualFriendWritable(String userID, long mutualFriendID) {
 		super();
-		this.userID = userID;
+		this.userID = Long.parseLong(userID);
 		this.mutualFriendID = mutualFriendID;
 	}
 
@@ -50,7 +50,8 @@ public class MutualFriendWritable implements Writable {
 
 	@Override
 	public String toString() {
-		return "MutualFriendWritable [userID=" + userID + ", mutualFriendID=" + mutualFriendID + "]";
+		return "MutualFriendWritable [userID=" + userID + ", mutualFriendID="
+				+ mutualFriendID + "]";
 	}
 
 }
