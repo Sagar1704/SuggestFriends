@@ -14,7 +14,7 @@ public class MutualFriendWritable implements Writable {
 		this(-1L, -1L);
 	}
 
-	public MutualFriendWritable(Long recommendedFriendID,
+	public MutualFriendWritable(long recommendedFriendID,
 			long mutualFriendID) {
 		super();
 		this.recommendedFriendID = recommendedFriendID;

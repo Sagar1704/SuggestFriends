@@ -1,7 +1,5 @@
 package bigdata.sea.suggest;
 
-import javax.xml.soap.Text;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -28,26 +26,47 @@ public class SuggestApplication extends Configured implements Tool {
 			System.exit(-1);
 		}
 
-		Job job = Job.getInstance(new Configuration());
+		// JobConf jobConf = new JobConf(getConf(), SuggestApplication.class);
+		// jobConf.setJobName("suggest");
+		//
+		// jobConf.setInputFormat(TextInputFormat.class);
+		// jobConf.setOutputKeyClass(LongWritable.class);
+		// jobConf.setOutputValueClass(Text.class);
+		// jobConf.setMapOutputKeyClass(LongWritable.class);
+		// jobConf.setMapOutputValueClass(MutualFriendWritable.class);
+		// jobConf.setOutputFormat(TextOutputFormat.class);
+		//
+		// FileInputFormat.setInputPaths(jobConf, args[0]);
+		// FileOutputFormat.setOutputPath(jobConf, new Path(args[1]));
+		//
+		// jobConf.setJarByClass(SuggestApplication.class);
+		//
+		// jobConf.setMapperClass(SuggestMapper.class);
+		// jobConf.setCombinerClass(SuggestReducer.class);
+		// jobConf.setReducerClass(SuggestReducer.class);
+		//
+		// JobClient.runJob(jobConf);
+		//
+		// return 0;
 
-		job.setOutputKeyClass(LongWritable.class);
-		job.setOutputValueClass(Text.class);
-
-		job.setMapperClass(SuggestMapper.class);
-		job.setCombinerClass(SuggestReducer.class);
-		job.setReducerClass(SuggestReducer.class);
-
-		job.setInputFormatClass(TextInputFormat.class);
-		job.setOutputFormatClass(TextOutputFormat.class);
-
-		FileInputFormat.setInputPaths(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-		job.setJarByClass(SuggestApplication.class);
-
-		if (job.waitForCompletion(true))
-			return 0;
-		return 1;
+		Configuration conf = new Configuration();
+		Job job = new Job(conf, "suggest");
+        job.setJarByClass(SuggestApplication.class);
+        job.setOutputKeyClass(LongWritable.class);
+        job.setOutputValueClass(MutualFriendWritable.class);
+ 
+        job.setMapperClass(SuggestMapper.class);
+        job.setReducerClass(SuggestReducer.class);
+ 
+        job.setInputFormatClass(TextInputFormat.class);
+        job.setOutputFormatClass(TextOutputFormat.class);
+ 
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		if(job.waitForCompletion(true))
+			return 1;
+		
+		return 0;
 	}
 
 }

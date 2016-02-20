@@ -15,19 +15,22 @@ public class SuggestMapper
 	@Override
 	protected void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
-		super.map(key, value, context);
 		String profile[] = value.toString().split("\t");
 		Long userId = Long.parseLong(profile[0]);
 		List<Long> friends = new ArrayList<Long>();
 		
+		System.out.println("Sagar::In Mapper");
+		
 		if (profile.length == 2) {
 			StringTokenizer tokens = new StringTokenizer(profile[1], ",");
-			while(tokens.hasMoreTokens()) {
+			while(tokens != null && tokens.hasMoreTokens()) {
 				Long friend = Long.parseLong(tokens.nextToken());
 				friends.add(friend);
 				context.write(new LongWritable(userId),
 						new MutualFriendWritable(friend, -1L));
 			}
+			
+			System.out.println("Sagar::friends-size::" + friends.size());
 
 			for (int friend1 = 0; friend1 < friends.size(); friend1++) {
 				for (int friend2 = friend1
