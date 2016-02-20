@@ -26,29 +26,6 @@ public class SuggestApplication extends Configured implements Tool {
 			System.exit(-1);
 		}
 
-		// JobConf jobConf = new JobConf(getConf(), SuggestApplication.class);
-		// jobConf.setJobName("suggest");
-		//
-		// jobConf.setInputFormat(TextInputFormat.class);
-		// jobConf.setOutputKeyClass(LongWritable.class);
-		// jobConf.setOutputValueClass(Text.class);
-		// jobConf.setMapOutputKeyClass(LongWritable.class);
-		// jobConf.setMapOutputValueClass(MutualFriendWritable.class);
-		// jobConf.setOutputFormat(TextOutputFormat.class);
-		//
-		// FileInputFormat.setInputPaths(jobConf, args[0]);
-		// FileOutputFormat.setOutputPath(jobConf, new Path(args[1]));
-		//
-		// jobConf.setJarByClass(SuggestApplication.class);
-		//
-		// jobConf.setMapperClass(SuggestMapper.class);
-		// jobConf.setCombinerClass(SuggestReducer.class);
-		// jobConf.setReducerClass(SuggestReducer.class);
-		//
-		// JobClient.runJob(jobConf);
-		//
-		// return 0;
-
 		Configuration conf = new Configuration();
 		Job job = new Job(conf, "suggest");
         job.setJarByClass(SuggestApplication.class);
@@ -65,7 +42,6 @@ public class SuggestApplication extends Configured implements Tool {
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 		if(job.waitForCompletion(true))
 			return 1;
-		
 		return 0;
 	}
 

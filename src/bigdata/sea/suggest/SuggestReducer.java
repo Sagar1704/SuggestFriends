@@ -1,11 +1,10 @@
 package bigdata.sea.suggest;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -20,46 +19,46 @@ public class SuggestReducer extends
 	protected void reduce(LongWritable key,
 			Iterable<MutualFriendWritable> values, Context context)
 					throws IOException, InterruptedException {
-		super.reduce(key, values, context);
+		final HashMap<Long, HashSet<Long>> recommendedFriends = new HashMap<Long, HashSet<Long>>();
 
-		final Map<Long, List<String>> mutualFriends = new HashMap<Long, List<String>>();
+		for (Iterator<MutualFriendWritable> iterator = values
+				.iterator(); iterator.hasNext();) {
+			MutualFriendWritable value = (MutualFriendWritable) iterator.next();
 
-		for (MutualFriendWritable value : values) {
 			Long recommendedFriendID = value.getRecommendedFriendID();
 			Long mutualFriendID = value.getMutualFriendID();
 
-			if (mutualFriends.containsKey(recommendedFriendID)) {
-				if (mutualFriends.get(recommendedFriendID) != null) {
+			if (recommendedFriends.containsKey(recommendedFriendID)) {
+				if (recommendedFriends.get(recommendedFriendID) != null) {
 					if (mutualFriendID == -1L) {
-						mutualFriends.put(recommendedFriendID, null);
+						recommendedFriends.put(recommendedFriendID, null);
 					} else {
-						mutualFriends.get(recommendedFriendID)
-								.add("" + mutualFriendID);
+						recommendedFriends.get(recommendedFriendID)
+								.add(mutualFriendID);
 					}
 				}
-
 			} else {
 				if (mutualFriendID == -1L) {
-					mutualFriends.put(recommendedFriendID, null);
+					recommendedFriends.put(recommendedFriendID, null);
 				} else {
-					ArrayList<String> mutualFriendsList = new ArrayList<String>();
-					mutualFriendsList.add("" + mutualFriendID);
-					mutualFriends.put(recommendedFriendID, mutualFriendsList);
+					HashSet<Long> mutualFriendsList = new HashSet<Long>();
+					mutualFriendsList.add(mutualFriendID);
+					recommendedFriends.put(recommendedFriendID,
+							mutualFriendsList);
 				}
 			}
 		}
 
-		SortedMap<Long, List<String>> sortedMutualFriends = new TreeMap<Long, List<String>>(
+		SortedMap<Long, HashSet<Long>> sortedRecommendedFriends = new TreeMap<Long, HashSet<Long>>(
 				new Comparator<Long>() {
 
 					@Override
 					public int compare(Long key1, Long key2) {
-						if (mutualFriends.get(key1).size() > mutualFriends
-								.get(key2).size()) {
+						int size1 = recommendedFriends.get(key1).size();
+						int size2 = recommendedFriends.get(key2).size();
+						if (size1 > size2) {
 							return -1;
-						} else if (mutualFriends.get(key1)
-								.size() == mutualFriends.get(key2).size()
-								&& key1 < key2) {
+						} else if (size1 == size2 && key1 < key2) {
 							return -1;
 						} else {
 							return 1;
@@ -67,24 +66,33 @@ public class SuggestReducer extends
 					}
 				});
 
-		for (Map.Entry<Long, List<String>> entry : mutualFriends.entrySet()) {
+		for (HashMap.Entry<Long, HashSet<Long>> entry : recommendedFriends
+				.entrySet()) {
 			if (entry.getValue() != null) {
-				sortedMutualFriends.put(entry.getKey(), entry.getValue());
+				sortedRecommendedFriends.put(entry.getKey(), entry.getValue());
 			}
 		}
 
 		String recommendation = "";
 		boolean first = true;
-		for (SortedMap.Entry<Long, List<String>> entry : sortedMutualFriends
+		int count = 0;
+		for (HashMap.Entry<Long, HashSet<Long>> entry : sortedRecommendedFriends
 				.entrySet()) {
+			if (count == 10)
+				break;
 			if (first) {
-				recommendation += entry.getKey().toString() + " -- "
-						+ entry.getValue();
-				first = false;
+				if (entry != null && entry.getKey() != null
+						&& entry.getValue() != null) {
+					recommendation = entry.getKey().toString();
+					first = false;
+				}
 			} else {
-				recommendation += ", " + entry.getKey().toString() + " -- "
-						+ entry.getValue();
+				if (entry != null && entry.getKey() != null
+						&& entry.getValue() != null) {
+					recommendation += "," + entry.getKey().toString();
+				}
 			}
+			count++;
 		}
 
 		context.write(key, new Text(recommendation));
