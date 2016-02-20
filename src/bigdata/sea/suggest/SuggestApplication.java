@@ -28,19 +28,21 @@ public class SuggestApplication extends Configured implements Tool {
 
 		Configuration conf = new Configuration();
 		Job job = new Job(conf, "suggest");
+        
         job.setJarByClass(SuggestApplication.class);
-        job.setOutputKeyClass(LongWritable.class);
-        job.setOutputValueClass(MutualFriendWritable.class);
- 
         job.setMapperClass(SuggestMapper.class);
         job.setReducerClass(SuggestReducer.class);
- 
+
+        job.setOutputKeyClass(LongWritable.class);
+        job.setOutputValueClass(MutualFriendWritable.class);
+        
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
  
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
-		if(job.waitForCompletion(true))
+		
+        if(job.waitForCompletion(true))
 			return 1;
 		return 0;
 	}
