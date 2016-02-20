@@ -28,8 +28,6 @@ public class SuggestMapper
 						new MutualFriendWritable(friend, -1L));
 			}
 
-			System.out.println("Sagar::friends-size::" + friends.size());
-
 			for (int friend1 = 0; friend1 < friends.size(); friend1++) {
 				for (int friend2 = friend1 + 1; friend2 < friends.size(); friend2++) {
 					if (friend1 != friend2) {
